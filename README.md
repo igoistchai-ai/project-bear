@@ -1,46 +1,42 @@
-# BEAR BOT
+# BEAR BOT — Telegram Bot + Mini App
 
-Проект состоит из:
+## Render (один Web Service)
 
-- `bot.py` — основной Telegram-бот, FastAPI API, SQLite, Telegram Mini App API, Stars, задания, кейсы, игры.
-- `server.mjs` — отдельная Node.js-версия визуального Web App; ВСЕ 30 сгенерированных изображений уже встроены в него как Base64.
-- `requirements.txt` — Python-зависимости.
-- `package.json` — запуск `server.mjs`, если нужен отдельный Node Web Service.
-- `.env` — секреты.
+Этот вариант запускается одним Python-сервисом. **`bot.py` сам отдаёт Telegram Mini App по `/`**, поэтому отдельный Node-сервис для `server.mjs` не нужен.
 
-## ВАЖНО ДЛЯ RENDER
+### Build Command
+```bash
+pip install -r requirements.txt
+```
 
-Если нужен **один Web Service**, используй основной `bot.py`:
+### Start Command
+```bash
+python bot.py
+```
 
-Build:
-`pip install -r requirements.txt`
-
-Start:
-`python bot.py`
-
-`server.mjs` в таком варианте не запускай отдельно — он является самостоятельной версией Web App/визуального сервера.
-
-Если хочешь запускать именно Node Web App отдельно:
-
-Build:
-`npm install`
-
-Start:
-`node server.mjs`
-
-Для Telegram Mini App в продакшене URL Web App должен указывать на публичный адрес сервиса, который реально обслуживает Mini App.
-
-## Изображения
-
-`server.mjs` содержит 30 PNG внутри Base64. Отдельные PNG-файлы для работы Web App не требуются.
-
-## ENV
-
-Секреты не помещай в код:
-
-BOT_TOKEN=...
-OWNER_ID=...
-ADMIN_IDS=...
-WEBAPP_URL=https://...
+### Environment Variables
+```env
+BOT_TOKEN=ТОКЕН_БОТА
+OWNER_ID=ТВОЙ_TELEGRAM_ID
+ADMIN_IDS=ТВОЙ_TELEGRAM_ID
+WEBAPP_URL=https://ТВОЙ-СЕРВИС.onrender.com
 DATABASE_PATH=bearbot.sqlite3
 PORT=10000
+```
+
+`WEBAPP_URL` должен быть **точным HTTPS-адресом Render Web Service**. Именно его бот использует для кнопки `Открыть BEAR BOT`.
+
+## Важно
+
+Если открыть `https://...onrender.com` обычным Chrome/Safari, Telegram не передаст `initData`, потому что это не запуск Mini App из Telegram. Теперь страница не падает с `empty initData`: она показывает визуальный preview.
+
+Для реального аккаунта, баланса, заданий и API нужно открывать Mini App через кнопку бота **Открыть BEAR BOT** в Telegram.
+
+## Файлы
+
+- `bot.py` — бот, FastAPI, SQLite, Telegram Stars и сам Mini App.
+- `requirements.txt` — Python-зависимости.
+- `server.mjs` — отдельная Node.js визуальная версия; для одного Render Web Service её запускать не требуется.
+- `package.json` — нужен только если отдельно запускается `server.mjs`.
+
+Не вставляй `BOT_TOKEN` в код или GitHub — только в Render Environment Variables.
