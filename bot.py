@@ -3,7 +3,6 @@
 # Single-file deployment for GitHub + Render
 #
 # IMPORTANT:
-# 1) Put your own image/sound URLs into the CONFIG section below.
 # 2) Put secrets into Render Environment Variables, NOT this file.
 # 3) Telegram Stars are used only for supported digital purchases/top-ups. Virtual games do not take Stars as a gambling stake.
 # 4) Random case rewards are virtual items and are NOT cash-equivalent.
@@ -1598,13 +1597,43 @@ function renderProfile(){
 }
 
 async function load(){
+  // Telegram injects initData only when the page is opened as a Telegram Mini App.
+  // If the Render URL is opened directly in Chrome/Safari, keep the visual app
+  // available instead of replacing the whole page with an "empty initData" error.
+  const hasTelegramInitData = !!(tg && tg.initData);
+
+  if(!hasTelegramInitData){
+    STATE.user={
+      id:0,
+      username:'preview',
+      first_name:'BEAR',
+      coins:0,
+      stars_spent:0,
+      is_admin:false
+    };
+    STATE.tasks=[];
+    STATE.cases=[
+      {key:'noob',name:'Noob',price:300,image:ASSETS.case_noob},
+      {key:'cash',name:'Big Cash',price:900,image:ASSETS.case_cash},
+      {key:'business',name:'Bussines',price:1900,image:ASSETS.case_business}
+    ];
+    STATE.history=[];
+    renderUser();
+    renderHome();
+    renderGames();
+    $('loading').style.display='none';
+    return;
+  }
+
   try{
     const d=await api('/api/bootstrap');
     STATE.user=d.user;
     STATE.tasks=d.tasks;
     STATE.cases=d.cases;
     STATE.history=d.history;
-    renderHome();renderGames();
+    renderUser();
+    renderHome();
+    renderGames();
     if(STATE.user?.is_admin)renderAdmin();
     $('loading').style.display='none';
   }catch(e){
@@ -1612,6 +1641,7 @@ async function load(){
       `<div style="padding:30px;text-align:center">
         <b>Не удалось открыть BEAR BOT</b>
         <p style="color:#8c9baa">${escapeHtml(e.message)}</p>
+        <button class="btn" style="margin-top:14px" onclick="load()">Повторить</button>
       </div>`;
   }
 }
@@ -1694,7 +1724,7 @@ async def index():
 
 @app.get("/api/webapp")
 async def webapp_info():
-    return {"webapp_url": WEBAPP_URL, "assets_source": "server.mjs"}
+    return {"webapp_url": WEBAPP_URL, "assets_source": "bot.py", "mini_app": True}
 
 @app.get("/health")
 async def health():
