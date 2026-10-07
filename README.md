@@ -1,42 +1,46 @@
-# BEAR BOT — Telegram Bot + Mini App
+# BEAR BOT — Render
 
-## Render (один Web Service)
+## Что теперь используется
 
-Этот вариант запускается одним Python-сервисом. **`bot.py` сам отдаёт Telegram Mini App по `/`**, поэтому отдельный Node-сервис для `server.mjs` не нужен.
+Главный файл — `bot.py`.
 
-### Build Command
+Mini App, API, Telegram Bot, SQLite и встроенные изображения работают из одного Python-сервиса. Внешние URL картинок для Mini App больше не нужны: 30 изображений встроены прямо в `bot.py` как Base64.
+
+`server.mjs` для запуска Mini App больше не требуется.
+
+## Render
+
+Build Command:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Start Command
+Start Command:
 ```bash
 python bot.py
 ```
 
-### Environment Variables
+## Environment Variables
+
 ```env
 BOT_TOKEN=ТОКЕН_БОТА
-OWNER_ID=ТВОЙ_TELEGRAM_ID
-ADMIN_IDS=ТВОЙ_TELEGRAM_ID
-WEBAPP_URL=https://ТВОЙ-СЕРВИС.onrender.com
+OWNER_ID=TELEGRAM_ID_ВЛАДЕЛЬЦА
+ADMIN_IDS=TELEGRAM_ID_ВЛАДЕЛЬЦА
+WEBAPP_URL=https://YOUR-SERVICE.onrender.com
 DATABASE_PATH=bearbot.sqlite3
 PORT=10000
 ```
 
-`WEBAPP_URL` должен быть **точным HTTPS-адресом Render Web Service**. Именно его бот использует для кнопки `Открыть BEAR BOT`.
-
 ## Важно
 
-Если открыть `https://...onrender.com` обычным Chrome/Safari, Telegram не передаст `initData`, потому что это не запуск Mini App из Telegram. Теперь страница не падает с `empty initData`: она показывает визуальный preview.
+- `WEBAPP_URL` должен указывать на тот же Render Web Service.
+- Кнопка Mini App отправляется ботом через Telegram Web App и получает настоящий `initData`.
+- Обычное открытие Render URL в браузере остаётся доступно как preview.
+- Для проверки подписки на Telegram-канал бот должен иметь возможность получить `chat_member` для этого канала.
+- Реферальная ссылка создаётся через `/start ref_<ID>` и сохраняет связь приглашённого пользователя.
 
-Для реального аккаунта, баланса, заданий и API нужно открывать Mini App через кнопку бота **Открыть BEAR BOT** в Telegram.
+## Игровая часть
 
-## Файлы
+В этой версии игровые экраны являются бесплатными визуальными механиками: апгрейд с выбором предметов, мины с выбором количества мин, замедленная ракетка с отдельной кнопкой «Забрать» и анимация кейса.
 
-- `bot.py` — бот, FastAPI, SQLite, Telegram Stars и сам Mini App.
-- `requirements.txt` — Python-зависимости.
-- `server.mjs` — отдельная Node.js визуальная версия; для одного Render Web Service её запускать не требуется.
-- `package.json` — нужен только если отдельно запускается `server.mjs`.
-
-Не вставляй `BOT_TOKEN` в код или GitHub — только в Render Environment Variables.
+Telegram Stars не используются как ставка в играх и не превращаются в игровой баланс. Платёж Stars может использоваться только для фиксированной цифровой покупки.
